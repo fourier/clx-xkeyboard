@@ -102,9 +102,9 @@
 
 (defun simple-key-event-viewer ()
   (let ((display (xlib:open-default-display)))
-    (xlib:enable-xkeyboard display)
+    (xlib:xkb-use-extension display)
     (key-event-viewer display (xlib::transform-xkb-keymap-to-client-mapping
-                               (xlib::get-map display xlib::+use-core-kbd+
+                               (xlib::xkb-get-map display xlib::+use-core-kbd+
                                               (logior xlib::+KeyTypes+
                                                       xlib::+KeySyms+))))
     (xlib:close-display display)))

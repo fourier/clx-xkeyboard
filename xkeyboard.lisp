@@ -32,12 +32,36 @@
           device-state-lookup-mods
           device-state-compat-lookup-mods
           device-state-ptr-btn-state
-
-          get-state
-          latch-lock-state
+          ;; XKB requests 
+          xkb-use-extension
+          ;; TODO: xkb-select-events
+          xkb-bell
+          xkb-get-state
+          xkb-latch-lock-state
+          ;; TODO: xkb-get-controls
+          ;; TODO: xkb-set-controls
+          xkb-get-map
+          ;; TODO xkb-set-map
+          ;; TODO xkb-get-compat-map
+          ;; TODO xkb-set-compat-map
+          ;; TODO xkb-get-indicator-state
+          ;; TODO xkb-get-indicator-map
+          ;; TODO xkb-set-indicator-map
+          ;; TODO xkb-get-named-indicator
+          ;; TODO xkb-set-named-indicator
+          ;; TODO xkb-get-names
+          ;; TODO xkb-set-names
+          ;; TODO xkb-get-geometry
+          ;; TOOD xkb-set-geometry
+          ;; TODO xkb-per-client-flags
+          ;; TODO xkb-list-compontents
+          ;; TODO xkb-get-kbd-by-name
+          ;; TODO xkb-get-device-info
+          ;; TODO xkb-set-device-info
+          ;; TODO xkb-set-debugging-flags
+          
           lock-group
-
-          get-map
+          
           transform-xkb-keymap-to-client-mapping
           keyevent->keysym
           xkb/keysym->character
@@ -90,7 +114,6 @@
   (define-card16-abrev idresult)
   (define-card16-abrev vmod)
   (define-card16-abrev idspec) 
-  (define-card16-abrev devicespec)
   (define-card16-abrev behavior) 
   (define-card16-abrev mapdetails)
   (define-card32-abrev indicator)
@@ -477,7 +500,7 @@
 (defmacro xkeyboard-opcode (display)
   `(extension-opcode ,display "XKEYBOARD"))
 
-(defun enable-xkeyboard (display &optional (major +major-version+) (minor +minor-version+))
+(defun xkb-use-extension (display &optional (major +major-version+) (minor +minor-version+))
   (declare (type display display))
   (with-buffer-request-and-reply (display (xkeyboard-opcode display) nil)
                                  ((data +use-extension+)
@@ -485,8 +508,6 @@
                                   (card16 minor))
     (values (boolean-get 1)
             (card16-get 8))))
-
-(export 'enable-xkeyboard)
 
 ;; (defun select-events (display))
 
@@ -528,7 +549,7 @@
   (compat-lookup-mods 0 :type keymask)
   (ptr-btn-state 0 :type butmask))
 
-(defun get-state (display &optional (device +use-core-kbd+))
+(defun xkb-get-state (display &optional (device +use-core-kbd+))
   (declare (type display display))
   (with-buffer-request-and-reply (display (xkeyboard-opcode display) nil)
                                  ((data +get-state+)
@@ -549,7 +570,7 @@
      :compat-lookup-mods (keymask-get 20)
      :ptr-btn-state (butmask-get 22))))
 
-(defun latch-lock-state (display &key (device +use-core-kbd+)
+(defun xkb-latch-lock-state (display &key (device +use-core-kbd+)
                                    affect-mod-locks
                                    mod-locks
                                    lock-group
@@ -573,7 +594,7 @@
     (int16 group-latch)))
 
 (defun lock-group (display &key (device +use-core-kbd+) group)
-  (latch-lock-state display :device device
+  (xkb-latch-lock-state display :device device
                             :affect-mod-locks 0
                             :mod-locks 0
                             :lock-group t
@@ -855,7 +876,7 @@
                         :list (loop repeat ,totalVModMapKeySym
                                     collect (vmodmap-get ,indexsym))))))))
 
-(defun get-map (display devicespec mappart-mask-full)
+(defun xkb-get-map (display devicespec mappart-mask-full)
   (with-buffer-request-and-reply (display (xkeyboard-opcode display) nil)
       ((data +get-map+)
        (devicespec devicespec)

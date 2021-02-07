@@ -7,7 +7,7 @@
 (in-package :stumpwm)
 
 (defun get-current-layout (display)
-  (xlib:device-state-locked-group (xlib:get-state display)))
+  (xlib:device-state-locked-group (xlib:xkb-get-state display)))
 
 (defun window-focus-changed (window previous-window)
   (let ((current-layout (get-current-layout *display*)))
@@ -26,7 +26,7 @@
 
 (defcommand enable-per-window-layout () ()
   (xlib::initialize-extensions *display*) ;; we need it because
-  (xlib:enable-xkeyboard *display*) ;; stumpwm opens display before extension definition  
+  (xlib:xkb-use-extension *display*) ;; stumpwm opens display before extension definition  
   (add-hook *focus-group-hook* 'group-focus-changed)
   (add-hook *focus-window-hook* 'window-focus-changed))
 
